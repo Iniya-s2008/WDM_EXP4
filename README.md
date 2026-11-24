@@ -1,5 +1,5 @@
 ### EX4 Implementation of Cluster and Visitor Segmentation for Navigation patterns
-### DATE: 
+### DATE: 24.10.2026
 ### AIM: To implement Cluster and Visitor Segmentation for Navigation patterns in Python.
 ### Description:
 <div align= "justify">Cluster visitor segmentation refers to the process of grouping or categorizing visitors to a website, 
@@ -16,34 +16,94 @@
 ### Program:
 ```python
 # Visitor segmentation based on characteristics
-# read the data
-/*WRITE YOUR CODE HERE
+import pandas as pd
+import matplotlib.pyplot as plt
+import os
 
-# Perform segmentation based on characteristics (e.g., age groups)
-/*WRITE YOUR CODE HERE
+# Read the newly created CSV file
+csv_path = "clustervisitor.csv"
+if os.path.exists(csv_path):
+    df = pd.read_csv(csv_path)
+else:
+    raise FileNotFoundError(f"{csv_path} not found. Please run the cell above to generate it first.")
 
-```
-### Output:
+# Select Age feature for clustering
+X = df["Age"].tolist()
 
-### Visualization:
-```python
-# Create a list to store counts of visitors in each age group
-/*WRITE YOUR CODE HERE
+# Number of clusters
+k = 3
 
-# Count visitors in each age group
-/*WRITE YOUR CODE HERE
-    
-# Define age group labels and plot a bar chart
-/*WRITE YOUR CODE HERE
+# Step 1: Choose initial centroids (first k values)
+centroids = X[:k]
 
-plt.figure(figsize=(8, 6))
-plt.bar(age_group_labels, visitor_counts, color='skyblue')
-plt.xlabel('Age Groups')
-plt.ylabel('Number of Visitors')
-plt.title('Visitor Distribution Across Age Groups')
+while True:
+    clusters = [[] for _ in range(k)]
+    labels = []
+
+    # Step 2: Assign each data point to the nearest centroid
+    for value in X:
+        distances = [abs(value - c) for c in centroids]
+        cluster = distances.index(min(distances))
+        clusters[cluster].append(value)
+        labels.append(cluster)
+
+    # Step 3: Calculate new centroids
+    new_centroids = []
+    for cluster in clusters:
+        if len(cluster) > 0:
+            new_centroids.append(sum(cluster) / len(cluster))
+        else:
+            new_centroids.append(0)
+
+    # Step 4: Stop if centroids do not change
+    if new_centroids == centroids:
+        break
+
+    centroids = new_centroids
+
+# Add cluster labels to DataFrame
+df["Cluster"] = labels
+
+# Display complete dataset
+print("Complete Dataset with Cluster Labels:")
+print(df.to_string())
+
+print("\nVisitor Segmentation (Cluster-wise)\n")
+
+# Display cluster-wise output
+for i in range(k):
+    print(f"Cluster {i}")
+    print(df[df["Cluster"] == i].to_string())
+    print("-" * 50)
+
+# Visualize clusters
+plt.figure(figsize=(8,6))
+
+colors = ["red", "blue", "green"]
+
+for i in range(k):
+    cluster_data = df[df["Cluster"] == i]
+    plt.scatter(cluster_data["Age"],
+                cluster_data["Cluster"],
+                color=colors[i],
+                s=80,
+                label=f"Cluster {i}")
+
+plt.xlabel("Age")
+plt.ylabel("Cluster")
+plt.title("Visitor Segmentation using K-Means (Your Dataset)")
+plt.legend()
+plt.grid(True)
 plt.show()
+
 ```
 ### Output:
+<img width="603" height="695" alt="image" src="https://github.com/user-attachments/assets/bcc11123-7e19-40bd-a0ea-ec6d39961682" />
+<img width="742" height="623" alt="image" src="https://github.com/user-attachments/assets/84a1ddfe-b8d7-4e6e-93d3-f4cfddc2de14" />
+
+### Output:
+<img width="1046" height="682" alt="image" src="https://github.com/user-attachments/assets/ce99e63e-74ee-4710-8292-630aecc86489" />
 
 
 ### Result:
+Thus, the Cluster and Visitor Segmentation algorithm was successfully implemented using Python. The website visitors were grouped into three clusters based on their age, and the segmented results were displayed and visualized using a scatter plot.
